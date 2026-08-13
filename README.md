@@ -1,35 +1,36 @@
-# Catalog Service
+# Serviço de Atividades Complementares
 
-Projeto inicial da disciplina de Arquitetura de Software. O objetivo é praticar
-uma **refatoração gradual para uma arquitetura em camadas**, começando por um
-caso de uso pequeno: a criação de produtos.
+Exemplo preparado para uma demonstração de refatoração em sala de aula. O caso
+de uso é a inscrição de alunos do ensino superior em atividades complementares.
 
-> Este repositório é propositalmente simples e ainda não possui as camadas de
-> controller, service e repository devidamente separadas. O comportamento atual
-> deve ser preservado enquanto a estrutura evolui.
+> Esta branch contém propositalmente uma implementação com responsabilidades
+> misturadas. Ela funciona, mas ainda não representa uma boa arquitetura. A
+> intenção é refatorá-la ao vivo para uma arquitetura em camadas.
 
 ## Cenário
 
-Uma API de catálogo precisa permitir o cadastro de um produto com nome,
-descrição e preço. Por enquanto, não fazem parte do exercício estoque,
-categorias, descontos, edição ou consulta de produtos.
+A instituição precisa registrar a inscrição de um aluno em uma atividade
+complementar. Cada inscrição possui:
+
+- nome do aluno;
+- matrícula;
+- nome da atividade;
+- modalidade, que pode ser `PRESENCIAL` ou `ONLINE`;
+- carga horária;
+- link de acesso, quando aplicável.
 
 ### Validações básicas
 
-- `nome` é obrigatório;
-- `descricao` é opcional;
-- `preco` é obrigatório e deve ser maior que zero;
-- o preço é armazenado com duas casas decimais.
+- nome do aluno, matrícula e nome da atividade são obrigatórios;
+- carga horária deve ser um número inteiro maior que zero;
+- modalidade deve ser `PRESENCIAL` ou `ONLINE`.
 
 ### Regras de negócio
 
-- o nome do produto deve ter pelo menos 3 caracteres;
-- produtos com preço a partir de R$ 1.000,00 precisam possuir uma descrição.
+- uma única atividade pode contabilizar no máximo 40 horas;
+- atividades online precisam possuir um link de acesso.
 
-As regras são executadas antes da persistência. Elas ainda estão no controller
-para que, durante a atividade, possam ser identificadas e movidas para o service.
-
-## Executando o projeto
+## Executando
 
 Pré-requisitos: Java 21 e Maven 3.9 ou superior.
 
@@ -37,47 +38,54 @@ Pré-requisitos: Java 21 e Maven 3.9 ou superior.
 mvn spring-boot:run
 ```
 
-A API estará disponível em `http://localhost:8080`. <br> 
-O projeto usa um banco H2   em memória, recriado sempre que a aplicação inicia.  
-O console pode ser acessado em `http://localhost:8080/h2-console`, usando:
+A API estará disponível em `http://localhost:8080`. O projeto usa um banco H2
+em memória. O console pode ser acessado em `http://localhost:8080/h2-console`,
+usando:
 
-- JDBC URL: `jdbc:h2:mem:catalog_service`
+- JDBC URL: `jdbc:h2:mem:atividades_complementares`
 - usuário: `sa`
 - senha: deixe em branco
 
-## Criando um produto
+## Criando uma inscrição
 
-`POST /api/produtos`
+`POST /api/inscricoes`
 
 ```bash
-curl -X POST http://localhost:8080/api/produtos \
+curl -X POST http://localhost:8080/api/inscricoes \
   -H "Content-Type: application/json" \
   -d '{
-    "nome": "Teclado mecânico",
-    "descricao": "Teclado ABNT2 com iluminação",
-    "preco": 349.90
+    "nomeAluno": "Ana Silva",
+    "matricula": "20261234",
+    "nomeAtividade": "Workshop de Git",
+    "modalidade": "ONLINE",
+    "cargaHoraria": 8,
+    "linkAcesso": "https://eventos.exemplo.edu/git"
   }'
 ```
 
-Resposta esperada: status `201 Created` e o produto com seu `id` gerado.
-Dados inválidos retornam status `400 Bad Request` e uma mensagem no campo
-`erro`.
+Uma inscrição válida retorna `201 Created`. Dados inválidos ou que não atendem
+às regras de negócio retornam `400 Bad Request`.
 
-## Sobre a Atividade
+## Roteiro da demonstração em sala
 
-Para executar os testes, use no terminal:
+Antes de começar, execute os testes:
 
 ```bash
 mvn test
 ```
 
-Observe o arquivo `ProdutoController`: hoje ele recebe a requisição, valida as
-regras e executa o SQL. Essas responsabilidades estão juntas de propósito.
+O `InscricaoController` recebe a requisição, converte dados, faz validações,
+aplica regras de negócio, executa SQL e monta a resposta HTTP. Essas
+responsabilidades estão juntas de propósito.
 
-A evolução poderia ser feita em etapas pequenas:
+Uma sequência possível para a refatoração é:
 
-1. representar o produto com uma classe, em vez de usar mapas;
+1. criar classes para representar a entrada, o domínio e a resposta;
 2. extrair o acesso ao banco para um repository;
-3. extrair as regras de criação para um service;
-4. deixar o controller responsável apenas pela comunicação HTTP;
-5. manter os testes passando depois de cada etapa.
+3. extrair as regras de inscrição para um service;
+4. deixar o controller responsável somente pela comunicação HTTP;
+5. ajustar os testes a cada pequena mudança, preservando o comportamento.
+
+Este exemplo usa um domínio independente para demonstrar o processo de
+refatoração e as decisões arquiteturais envolvidas, sem oferecer uma solução
+diretamente reaproveitável em outro exercício.

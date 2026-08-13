@@ -1,12 +1,12 @@
-package br.edu.fag.catalogservice;
+package br.edu.fag.atividadescomplementares;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class CatalogServiceApplication {
+public class AtividadesComplementaresApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(CatalogServiceApplication.class, args);
+        SpringApplication.run(AtividadesComplementaresApplication.class, args);
     }
 }
