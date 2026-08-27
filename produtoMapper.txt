@@ -1,0 +1,32 @@
+package br.edu.fag.catalogservice.service.mapper;
+
+import br.edu.fag.catalogservice.model.Produto;
+import br.edu.fag.catalogservice.service.dto.ProdutoDTO;
+
+public class ProdutoMapper {
+
+    public static Produto paraModel(ProdutoDTO dto) {
+
+        Produto produto = new Produto(
+                dto.getNome(),
+                dto.getDescricao(),
+                dto.getPreco()
+        );
+
+        produto.setId(dto.getId());
+        produto.setCriadoEm(dto.getCriadoEm());
+
+        return produto;
+    }
+
+    public static ProdutoDTO paraDTO(Produto produto) {
+
+        return new ProdutoDTO(
+                produto.getId(),
+                produto.getNome(),
+                produto.getDescricao(),
+                produto.getPreco(),
+                produto.getCriadoEm()
+        );
+    }
+}
