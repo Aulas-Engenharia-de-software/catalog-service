@@ -6,5 +6,6 @@ CREATE TABLE IF NOT EXISTS produtos (
     nome VARCHAR(150) NOT NULL,
     descricao VARCHAR(500),
     preco DOUBLE NOT NULL,
-    criado_em TIMESTAMP NOT NULL
+    criado_em TIMESTAMP NOT NULL,
+    ativo BOOLEAN NOT NULL
 );

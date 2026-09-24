@@ -1,12 +1,11 @@
 # Catalog Service
 
-Projeto inicial da disciplina de Arquitetura de Software. O objetivo é praticar
-uma **refatoração gradual para uma arquitetura em camadas**, começando por um
-caso de uso pequeno: a criação de produtos.
+Projeto da disciplina de Arquitetura de Software para cadastrar produtos usando
+uma arquitetura em camadas.
 
-> Este repositório é propositalmente simples e ainda não possui as camadas de
-> controller, service e repository devidamente separadas. O comportamento atual
-> deve ser preservado enquanto a estrutura evolui.
+O fluxo passa pelo controller, service, domínio e repository. O controller
+cuida apenas da entrada HTTP, o service coordena a criação, o domínio valida
+as regras e o repository salva o produto no banco.
 
 ## Cenário
 
@@ -26,8 +25,7 @@ categorias, descontos, edição ou consulta de produtos.
 - o nome do produto deve ter pelo menos 3 caracteres;
 - produtos com preço a partir de R$ 1.000,00 precisam possuir uma descrição.
 
-As regras são executadas antes da persistência. Elas ainda estão no controller
-para que, durante a atividade, possam ser identificadas e movidas para o service.
+As regras são executadas antes de salvar o produto no banco.
 
 ## Executando o projeto
 
@@ -63,21 +61,31 @@ Resposta esperada: status `201 Created` e o produto com seu `id` gerado.
 Dados inválidos retornam status `400 Bad Request` e uma mensagem no campo
 `erro`.
 
-## Sobre a Atividade
+## Testes
 
-Para executar os testes, use no terminal:
+Para executar os testes:
 
 ```bash
 mvn test
 ```
 
-Observe o arquivo `ProdutoController`: hoje ele recebe a requisição, valida as
-regras e executa o SQL. Essas responsabilidades estão juntas de propósito.
+## Consultando e desativando produtos
 
-A evolução poderia ser feita em etapas pequenas:
+Consultar um produto, mesmo desativado:
 
-1. representar o produto com uma classe, em vez de usar mapas;
-2. extrair o acesso ao banco para um repository;
-3. extrair as regras de criação para um service;
-4. deixar o controller responsável apenas pela comunicação HTTP;
-5. manter os testes passando depois de cada etapa.
+```bash
+curl http://localhost:8080/products/1
+```
+
+Consultar somente produtos ativos:
+
+```bash
+curl "http://localhost:8080/products?active=true"
+```
+
+Desativar um produto sem removê-lo do banco:
+
+```bash
+curl -X PATCH http://localhost:8080/products/1/deactivate
+```
+
